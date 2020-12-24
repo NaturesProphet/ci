@@ -95,4 +95,4 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm i upgrade-rancher
-      - run: ./node_modules/.bin/upgrade-rancher --IMAGE docker pull docker.pkg.github.com/naturesprophet/ci/teste:stable --SERVICE_ID 1s779
+      - run: ./node_modules/.bin/upgrade-rancher --IMAGE docker pull docker.pkg.github.com/naturesprophet/ci/teste:stable --SERVICE_ID ${{ secrets.SERVICE_ID }}
