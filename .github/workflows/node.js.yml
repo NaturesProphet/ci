@@ -9,6 +9,7 @@ env:
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
   DB_SCHEMA: ${{ secrets.DB_SCHEMA }}
   DB_DROP_SCHEMA: ${{ secrets.DB_DROP_SCHEMA }}
+  IMAGE_NAME: teste
 
 on:
   push:
