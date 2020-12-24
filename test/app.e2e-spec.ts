@@ -6,11 +6,10 @@ import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { getConnection } from 'typeorm';
 
-
 describe( 'AppController (e2e)', () => {
   let app: INestApplication;
 
-  beforeEach( async () => {
+  beforeAll( async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule( {
       imports: [ AppModule ],
     } ).compile();
@@ -21,7 +20,7 @@ describe( 'AppController (e2e)', () => {
 
   afterAll( async () => {
     const con = getConnection();
-    con.close();
+    await con.close();
   } )
 
   it( '/ (GET)', () => {

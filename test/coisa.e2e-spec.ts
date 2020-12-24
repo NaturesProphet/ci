@@ -1,20 +1,23 @@
 import { config } from 'dotenv';
 config();
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, Logger } from '@nestjs/common';
 import * as request from 'supertest';
 import { Connection, getConnection } from 'typeorm';
 import { CoisaModule } from '../src/coisas/coisa.module';
 import { Coisa } from '../src/database/entities/coisa.entitie';
+Logger.overrideLogger( [ 'error' ] )
 
 
 describe( 'CoisaController (e2e)', () => {
   let app: INestApplication;
   let con: Connection;
 
-  beforeEach( async () => {
+
+
+  beforeAll( async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule( {
-      imports: [ CoisaModule ],
+      imports: [ CoisaModule ]
     } ).compile();
 
     app = moduleFixture.createNestApplication();
@@ -22,9 +25,15 @@ describe( 'CoisaController (e2e)', () => {
     con = getConnection();
   } );
 
+
+
+
   afterAll( async () => {
-    con.close();
+    await con.close();
   } )
+
+
+
 
   it( '/coisa (GET)', async () => {
     // cria registros para serem listados
@@ -35,6 +44,28 @@ describe( 'CoisaController (e2e)', () => {
     expect( result.body.length ).toBe( 2 );
     expect( result.body[ 1 ].name ).toBe( "teste 2" )
   } );
+
+
+
+
+
+  it( '/coisa (POST)', async () => {
+    const result = await request( app.getHttpServer() )
+      .post( '/coisa' )
+      .send( { name: "negocin" } );
+    expect( result.status ).toBe( 201 );
+    expect( result.body.id ).toBeGreaterThan( 0 )
+    expect( result.body.createdAt ).toBeDefined()
+    expect( result.body.name ).toBe( "negocin" )
+  } );
+
+
+
+
+
+
+
+
 } );
 
 
