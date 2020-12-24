@@ -1,0 +1,83 @@
+version: '3'
+
+services:
+
+  # mongodb:
+  #   container_name: mongodb-server
+  #   image: mongo:4.2.0-bionic
+  #   ports:
+  #     - "27017:27017"
+  #   environment: 
+  #     - MONGO_INITDB_ROOT_PASSWORD=auim
+  #     - MONGO_INITDB_ROOT_USERNAME=auim
+  #   volumes:
+  #     - ./DOCKER-VOLUMES/mongo/configdb:/data/configdb
+  #     - ./DOCKER-VOLUMES/mongo/db:/data/db
+
+  postgre:
+    container_name: postgre-server
+    image: postgres:alpine
+    ports:
+      - "5432:5432"
+    environment: 
+      - POSTGRES_DB=starter
+      - POSTGRES_USER=auim
+      - POSTGRES_PASSWORD=auim
+    # depends_on:
+    #   - mongodb
+    # volumes:
+    #   - ./DOCKER-VOLUMES/postgre:/var/lib/postgresql
+    #   - ./DOCKER-VOLUMES/postgre/data:/var/lib/postgresql/data
+
+  # redis:
+  #   container_name: redis-server
+  #   image: redis:6-alpine
+  #   command: redis-server --requirepass auim
+  #   ports:
+  #     - "6379:6379"
+  #   environment: 
+  #     - POSTGRES_DB=starter
+  #     - POSTGRES_USER=auim
+  #     - POSTGRES_PASSWORD=auim
+  #   depends_on:
+  #     - mongodb
+  #     - postgre
+  #   volumes:
+  #     - ./DOCKER-VOLUMES/postgre:/var/lib/postgresql
+  #     - ./DOCKER-VOLUMES/postgre/data:/var/lib/postgresql/data
+
+
+
+  # rabbitmq:
+  #   container_name: rabbitmq-server
+  #   image: rabbitmq:3.8-management
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   environment: 
+  #     - RABBITMQ_DEFAULT_USER=garcia
+  #     - RABBITMQ_DEFAULT_PASS=123456
+  #   depends_on:
+  #     - mongodb
+  #     - postgre
+  #     - redis
+
+
+
+  # api:
+  #   container_name: API
+  #   build:
+  #     context: ./
+  #     dockerfile: ./Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   environment: 
+  #     - DB_HOST=postgre
+  #   depends_on:
+  #     - postgre
+  #     - mongodb
+  #     - redis
+
+networks:
+  default:
+    driver: bridge
