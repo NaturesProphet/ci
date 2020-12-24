@@ -3,6 +3,7 @@
 
 name: Node.js CI
 env:
+  NODE_ENV: ${{ secrets.NODE_ENV }}
   DB_HOST: ${{ secrets.DB_HOST }}
   DB_USER: ${{ secrets.DB_USER }}
   DB_PORT: ${{ secrets.DB_PORT }}
