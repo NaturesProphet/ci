@@ -10,6 +10,10 @@ env:
   DB_SCHEMA: ${{ secrets.DB_SCHEMA }}
   DB_DROP_SCHEMA: ${{ secrets.DB_DROP_SCHEMA }}
   IMAGE_NAME: teste
+  SERVICE_ID: ${{ secrets.SERVICE_ID }}
+  RANCHER_URL: ${{ secrets.RANCHER_URL }}
+  RANCHER_ACCESS_KEY: ${{ secrets.RANCHER_ACCESS_KEY }}
+  RANCHER_SECRET_KEY: ${{ secrets.RANCHER_SECRET_KEY }}
 
 on:
   push:
@@ -81,3 +85,14 @@ jobs:
           echo VERSION=$VERSION
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+
+  Deploy:
+    needs: [compile, tests, Build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm i upgrade-rancher
+      - run: ./node_modules/.bin/upgrade-rancher --IMAGE docker pull docker.pkg.github.com/naturesprophet/ci/teste:stable --SERVICE_ID 1s779
