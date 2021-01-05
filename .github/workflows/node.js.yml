@@ -103,6 +103,15 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: echo pat = $DOCKER_PATH
+      - run: |
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME
+
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          VERSION=${{ steps.extract_branch.outputs.branch }}
+
+          echo "::set-env name=DOCKER_PATH::$IMAGE_ID:$VERSION"
+
       - run: npm i upgrade-rancher
       - run: ./node_modules/.bin/upgrade-rancher --IMAGE $DOCKER_PATH --SERVICE_ID ${{ secrets.SERVICE_ID }}
