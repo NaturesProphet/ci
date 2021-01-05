@@ -93,8 +93,6 @@ jobs:
 
           docker push $IMAGE_ID:$VERSION
 
-          echo "::set-env name=DOCKER_PATH::$IMAGE_ID:$VERSION"
-
   Deploy:
     needs: [compile, tests, Build]
     runs-on: ubuntu-latest
@@ -103,6 +101,11 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+      - run: npm i upgrade-rancher
       - run: |
           IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME
 
@@ -111,7 +114,4 @@ jobs:
 
           VERSION=${{ steps.extract_branch.outputs.branch }}
 
-          echo "::set-env name=DOCKER_PATH::$IMAGE_ID:$VERSION"
-
-      - run: npm i upgrade-rancher
-      - run: ./node_modules/.bin/upgrade-rancher --IMAGE $DOCKER_PATH --SERVICE_ID ${{ secrets.SERVICE_ID }}
+          ./node_modules/.bin/upgrade-rancher --IMAGE $IMAGE_ID:$VERSION --SERVICE_ID ${{ secrets.SERVICE_ID }}
