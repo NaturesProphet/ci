@@ -15,8 +15,6 @@ env:
   RANCHER_ACCESS_KEY: ${{ secrets.RANCHER_ACCESS_KEY }}
   RANCHER_SECRET_KEY: ${{ secrets.RANCHER_SECRET_KEY }}
   DOCKER_IMAGE_NAME: api
-  DOCKER_PATH: ""
-  DOCKER_TEMP_NAME: "img"
 
 on:
   push:
@@ -72,7 +70,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build image
-        run: docker build . --file Dockerfile --tag $DOCKER_TEMP_NAME
+        run: docker build . --file Dockerfile --tag img
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
@@ -90,10 +88,10 @@ jobs:
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
           VERSION=${{ steps.extract_branch.outputs.branch }}
-          $DOCKER_PATH=$IMAGE_ID:$VERSION
 
-          docker tag $DOCKER_TEMP_NAME $DOCKER_PATH
-          docker push $DOCKER_PATH
+          docker tag img $IMAGE_ID:$VERSION
+
+          docker push $IMAGE_ID:$VERSION
 
   Deploy:
     needs: [compile, tests, Build]
@@ -103,6 +101,5 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: echo $DOCKER_PATH
       - run: npm i upgrade-rancher
-      - run: ./node_modules/.bin/upgrade-rancher --IMAGE $DOCKER_PATH --SERVICE_ID ${{ secrets.SERVICE_ID }}
+      - run: ./node_modules/.bin/upgrade-rancher --IMAGE docker pull $IMAGE_ID:$VERSION --SERVICE_ID ${{ secrets.SERVICE_ID }}
