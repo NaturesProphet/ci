@@ -99,4 +99,4 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm i upgrade-rancher
-      - run: ./node_modules/.bin/upgrade-rancher --IMAGE docker pull $IMAGE_ID:$VERSION --SERVICE_ID ${{ secrets.SERVICE_ID }}
+      - run: ./node_modules/.bin/upgrade-rancher --IMAGE $IMAGE_ID:$VERSION --SERVICE_ID ${{ secrets.SERVICE_ID }}
