@@ -15,6 +15,8 @@ env:
   RANCHER_ACCESS_KEY: ${{ secrets.RANCHER_ACCESS_KEY }}
   RANCHER_SECRET_KEY: ${{ secrets.RANCHER_SECRET_KEY }}
   DOCKER_IMAGE_NAME: api
+  IMAGE_ID: ""
+  VERSION: ""
 
 on:
   push:
@@ -85,8 +87,8 @@ jobs:
           IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$DOCKER_IMAGE_NAME
 
           # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          VERSION=${{ steps.extract_branch.outputs.branch }}
+          $IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          $VERSION=${{ steps.extract_branch.outputs.branch }}
           docker tag img $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
@@ -98,5 +100,6 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+      - run: echo $IMAGE_ID:$VERSION
       - run: npm i upgrade-rancher
       - run: ./node_modules/.bin/upgrade-rancher --IMAGE $IMAGE_ID:$VERSION --SERVICE_ID ${{ secrets.SERVICE_ID }}
