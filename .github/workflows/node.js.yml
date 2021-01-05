@@ -94,7 +94,7 @@ jobs:
 
           docker push $IMAGE_ID:$VERSION
 
-          $DOCKER_PATH=$IMAGE_ID:$VERSION
+          DOCKER_PATH=$IMAGE_ID:$VERSION
 
   Deploy:
     needs: [compile, tests, Build]
