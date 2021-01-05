@@ -15,7 +15,6 @@ env:
   RANCHER_ACCESS_KEY: ${{ secrets.RANCHER_ACCESS_KEY }}
   RANCHER_SECRET_KEY: ${{ secrets.RANCHER_SECRET_KEY }}
   DOCKER_IMAGE_NAME: api
-  DOCKER_PATH: "ASD/ASD"
 
 on:
   push:
@@ -94,7 +93,7 @@ jobs:
 
           docker push $IMAGE_ID:$VERSION
 
-          DOCKER_PATH=$IMAGE_ID:$VERSION
+          echo "::set-env name=DOCKER_PATH::$IMAGE_ID:$VERSION"
 
   Deploy:
     needs: [compile, tests, Build]
