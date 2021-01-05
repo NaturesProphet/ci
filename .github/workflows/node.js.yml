@@ -10,7 +10,6 @@ env:
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
   DB_SCHEMA: ${{ secrets.DB_SCHEMA }}
   DB_DROP_SCHEMA: ${{ secrets.DB_DROP_SCHEMA }}
-  IMAGE_NAME: teste
   SERVICE_ID: ${{ secrets.SERVICE_ID }}
   RANCHER_URL: ${{ secrets.RANCHER_URL }}
   RANCHER_ACCESS_KEY: ${{ secrets.RANCHER_ACCESS_KEY }}
@@ -70,21 +69,19 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+        run: docker build . --file Dockerfile --tag img
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
       - name: Push image
         run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}
 
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           VERSION=stable
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker tag img $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
   Deploy:
@@ -96,4 +93,4 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm i upgrade-rancher
-      - run: ./node_modules/.bin/upgrade-rancher --IMAGE docker pull docker.pkg.github.com/naturesprophet/ci/teste:stable --SERVICE_ID ${{ secrets.SERVICE_ID }}
+      - run: ./node_modules/.bin/upgrade-rancher --IMAGE docker pull $IMAGE_ID:$VERSION --SERVICE_ID ${{ secrets.SERVICE_ID }}
