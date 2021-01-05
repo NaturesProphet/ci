@@ -14,6 +14,7 @@ env:
   RANCHER_URL: ${{ secrets.RANCHER_URL }}
   RANCHER_ACCESS_KEY: ${{ secrets.RANCHER_ACCESS_KEY }}
   RANCHER_SECRET_KEY: ${{ secrets.RANCHER_SECRET_KEY }}
+  DOCKER_IMAGE_NAME: api
 
 on:
   push:
@@ -74,13 +75,18 @@ jobs:
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
       - name: Push image
         run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/${{ DOCKER_IMAGE_NAME }}
 
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          VERSION=stable
+          VERSION=${{ steps.extract_branch.outputs.branch }}
           docker tag img $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
